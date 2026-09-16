@@ -43,7 +43,7 @@ export default async function handler(req,res){
       const out={teacher,conflictId:s.conflictId,status:s.status,resultsVisible:s.resultsVisible,version:s.version,conflict,question:'עד כמה לדעתכם המחלוקת הזו סיכנה את הבית המשותף?',scale:{min:1,max:10,minLabel:'כמעט לא סיכנה',maxLabel:'סיכנה מאוד'}};
       out.myVote=await getVote(code,s.conflictId,voterId);
       if(teacher||s.resultsVisible)out.stats=await stats(code,s.conflictId);
-      if(teacher)out.summary=await summary(code);
+      if(teacher&&String(req.query?.summary||'1')!=='0')out.summary=await summary(code);
       return res.json(out);
     }
     if(req.method!=='POST')return res.status(405).json({error:'method'});
@@ -69,6 +69,6 @@ export default async function handler(req,res){
     }else if(action==='resetAll'){
       for(const id of ORDER)await resetConflict(code,id);s={conflictId:'giva',status:'closed',resultsVisible:false,version:(s.version||0)+1};
     }else return res.status(400).json({error:'action'});
-    await saveState(code,s);return res.json({ok:true,...s,stats:await stats(code,s.conflictId),summary:await summary(code)});
+    await saveState(code,s);return res.json({ok:true,...s,stats:await stats(code,s.conflictId)});
   }catch(error){console.error(error);return res.status(500).json({error:'server_error'});}
 }
