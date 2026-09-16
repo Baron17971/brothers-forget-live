@@ -1,0 +1,27 @@
+.hero{
+  min-height:360px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  background-image:linear-gradient(90deg,rgba(7,20,32,.82) 0%,rgba(7,20,32,.58) 42%,rgba(7,20,32,.30) 72%,rgba(7,20,32,.18) 100%),url('/brothers-forget.png');
+  background-size:cover;
+  background-position:center center;
+  color:#fff;
+  border-color:rgba(255,255,255,.12);
+}
+.hero:after{display:none}
+.hero .eyebrow{color:rgba(255,255,255,.78)}
+.hero h1{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.34)}
+.hero p{color:rgba(255,255,255,.92);text-shadow:0 2px 12px rgba(0,0,0,.28)}
+.hero .question{
+  max-width:780px;
+  color:#fff;
+  background:rgba(7,24,38,.60);
+  border-color:rgba(255,255,255,.16);
+  backdrop-filter:blur(4px);
+  box-shadow:0 10px 28px rgba(0,0,0,.16);
+}
+@media(max-width:800px){
+  .hero{min-height:390px;background-position:50% center;padding:26px 20px}
+  .hero .question{background:rgba(7,24,38,.70)}
+}
