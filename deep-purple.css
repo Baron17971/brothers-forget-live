@@ -1,0 +1,55 @@
+:root{
+  --ink:#2b1748;
+  --ink2:#513a6f;
+  --paper:#f4f0f7;
+  --card:#fffafd;
+  --line:#d7cce3;
+  --blue:#e5daef;
+  --sage:#e9e1f1;
+  --beige:#eee7f4;
+  --rose:#eadce9;
+  --gold:#8f72b2;
+  --muted:#786b87;
+  --danger:#8a4e68;
+  --shadow:0 14px 36px rgba(48,25,78,.12);
+}
+html,body{
+  background:
+    radial-gradient(circle at 12% 8%,rgba(114,84,153,.14),transparent 30%),
+    radial-gradient(circle at 88% 90%,rgba(63,36,101,.12),transparent 28%),
+    var(--paper);
+}
+.hero{
+  min-height:390px;
+  justify-content:flex-end;
+  padding-bottom:12px;
+  background-image:
+    linear-gradient(90deg,rgba(28,12,49,.86) 0%,rgba(38,18,65,.64) 42%,rgba(50,27,79,.34) 72%,rgba(35,17,57,.20) 100%),
+    url('/brothers-forget.png');
+}
+.hero p{display:none}
+.hero h1{margin-top:6px;margin-bottom:8px}
+.hero .eyebrow{color:rgba(255,255,255,.74)}
+.hero .question{
+  margin-top:8px;
+  background:rgba(40,18,66,.62);
+  border-color:rgba(255,255,255,.16);
+}
+.btn.pri{background:#321c52;box-shadow:0 8px 20px rgba(50,28,82,.22)}
+.btn.soft{background:#e4d8ef;color:#2b1748}
+.btn.ghost{background:#f7f3f9;border-color:#d6c9e2;color:#2b1748}
+.stage.on{background:#e4d8ef;border-color:#a88bc4;box-shadow:inset 0 0 0 1px #a88bc4}
+.pick.active{background:#321c52;border-color:#321c52}
+.conflict-option.active{border-color:#6d4d8f;box-shadow:0 0 0 3px rgba(109,77,143,.12)}
+.word-cloud{background:linear-gradient(145deg,#fff,#f4eef8)}
+.cloud-word{color:#321c52}
+.callout{background:#eee7f4;border-right-color:#8f72b2}
+.word-chip{border-color:#cab9d9!important;color:#3a225a!important;background:#faf7fc!important}
+.word-chip.selected{background:#3a225a!important;color:#fff!important;border-color:#3a225a!important}
+.charter-panel,.charter-final{border-color:#d5c6e2!important;background:#fcf9fe!important}
+.charter-rule.selected{border-color:#765493!important;background:#eee6f5!important}
+@media(max-width:800px){
+  .hero{min-height:410px;padding-bottom:8px;background-position:50% center}
+  .hero h1{margin-bottom:6px}
+  .hero .question{margin-top:6px;background:rgba(40,18,66,.72)}
+}
