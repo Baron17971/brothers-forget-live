@@ -53,7 +53,7 @@ function injectTeacherParts(){
  let nav=document.getElementById('teacherFourParts');
  if(!nav){
    nav=document.createElement('div');nav.id='teacherFourParts';nav.className='four-parts-nav';
-   nav.innerHTML=`<button data-part="1"><strong>1. הסיפורים</strong><span>הצגת שמונת הסיפורים</span></button><button data-part="2"><strong>2. מד חום</strong><span>עד כמה נפגעה אחדות העם?</span></button><button data-part="3"><strong>3. מה חוזר שוב ושוב?</strong><span>בחירת 3 מילים</span></button><button data-part="4"><strong>4. האמנה הכיתתית</strong><span>5 כללים לניהול מחלוקת</span></button>`;
+   nav.innerHTML=`<button data-part="1"><strong>1. הסיפורים</strong><span>הצגת שמונת הסיפורים</span></button><button data-part="2"><strong>2. מד חום</strong><span>עד כמה כל סיפור סיכן את אחדות העם?</span></button><button data-part="3"><strong>3. מה חוזר שוב ושוב?</strong><span>בחירת 3 מילים</span></button><button data-part="4"><strong>4. האמנה הכיתתית</strong><span>5 כללים לניהול מחלוקת</span></button>`;
    title.insertAdjacentElement('afterend',nav);
    nav.querySelectorAll('[data-part]').forEach(b=>b.onclick=()=>openTeacherPart(Number(b.dataset.part)));
  }
@@ -74,7 +74,7 @@ function patchThermometer(){
 function patchCharter(){
  const card=document.querySelector('.charter-modal-card');if(!card)return;
  const walker=document.createTreeWalker(card,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
- nodes.forEach(n=>{let t=n.nodeValue||'';let v=t.replaceAll('למידה בחברותא · חלק ב','למידה בחברותא · חלק ד׳').replaceAll('למידה בחברותא · חלק ג׳','למידה בחברותא · חלק ד׳');if(v!==t)n.nodeValue=v;});
+ nodes.forEach(n=>{let t=n.nodeValue||'';let v=t.replaceAll('למידה בחברותא · חלק ב׳','למידה בחברותא · חלק ד׳').replaceAll('למידה בחברותא · חלק ג׳','למידה בחברותא · חלק ד׳');if(v!==t)n.nodeValue=v;});
 }
 
 function patchWords(){
@@ -106,7 +106,9 @@ function injectProjectorParts(){
 }
 
 function patchHome(){
- const note=document.getElementById('charterHomeNote');if(note)note.innerHTML='<strong>ארבעת חלקי הפעילות:</strong> 1. הצגת שמונת הסיפורים; 2. מד חום – עד כמה כל סיפור סיכן את אחדות העם; 3. „מה חוזר שוב ושוב?” – בחירת 3 מילים; 4. האמנה הכיתתית – בחירת חמישה כללים.';
+ const note=document.getElementById('charterHomeNote');if(!note)return;
+ const html='<strong>ארבעת חלקי הפעילות:</strong> 1. הצגת שמונת הסיפורים; 2. מד חום – עד כמה כל סיפור סיכן את אחדות העם; 3. „מה חוזר שוב ושוב?” – בחירת 3 מילים; 4. האמנה הכיתתית – בחירת חמישה כללים.';
+ if(note.innerHTML!==html)note.innerHTML=html;
 }
 
 function patch(){scheduled=false;ensureStyles();injectTeacherParts();injectProjectorParts();patchThermometer();patchCharter();patchWords();patchHome();}
