@@ -3,7 +3,7 @@
 const app=document.getElementById('app');
 const p=new URLSearchParams(location.search);
 const path=location.pathname;
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'})[c]);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const teacherUrl=(code,token)=>location.origin+'/teacher?code='+encodeURIComponent(code)+'&token='+encodeURIComponent(token);
 async function access(body){const r=await fetch('/api/access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let d={};try{d=await r.json();}catch(e){}if(!r.ok){const er=new Error(d.error||'request');er.code=d.error;throw er;}return d;}
 function storeTeacher(code,token){const u=teacherUrl(code,token);try{localStorage.setItem('brothers-forget-last-room',u);localStorage.setItem('brothers-forget-last-code',code);}catch(e){}return u;}
