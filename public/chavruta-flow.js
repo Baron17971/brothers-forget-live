@@ -92,10 +92,14 @@ function patchWords(){
 }
 
 function openProjectorPart(n){
- if(n===1){setStage(1).then(()=>setTimeout(()=>{const b=document.querySelector('[data-pview="board"]');if(b)b.click();},500));return;}
- if(n===2){setStage(1).then(()=>setTimeout(()=>waitFor('#projectorThermoBtn',b=>b.click()),500));return;}
- if(n===3){setStage(2);return;}
- if(n===4){setStage(1).then(()=>setTimeout(()=>{const b=document.querySelector('[data-pview="charter"]');if(b)b.click();},700));}
+ if(n===1){window.dispatchEvent(new CustomEvent('projector-part-change',{detail:1}));return;}
+ if(n===2){
+   window.dispatchEvent(new CustomEvent('projector-part-change',{detail:1}));
+   setTimeout(()=>waitFor('#projectorThermoBtn',b=>{if(!b.classList.contains('on'))b.click();}),500);
+   return;
+ }
+ if(n===3){window.dispatchEvent(new CustomEvent('projector-part-change',{detail:3}));return;}
+ if(n===4){window.dispatchEvent(new CustomEvent('projector-part-change',{detail:4}));return;}
 }
 
 function injectProjectorParts(){
