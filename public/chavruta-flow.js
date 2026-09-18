@@ -91,15 +91,19 @@ function patchWords(){
  if(isTeacher&&!isProjector&&stage()===2){const activity=document.querySelector('.grid.two > .card:first-child');if(activity){const q=[...activity.querySelectorAll('.q,h2,h3,div')].find(x=>x.textContent.trim()==='מה חוזר שוב ושוב?');if(q)setText(q,'מה חוזר שוב ושוב?');const p=activity.querySelector('p.muted');if(p&&p.textContent.includes('שלוש מילים'))setText(p,'כל תלמיד בוחר בדיוק 3 מילים. התוצאות נבנות בזמן אמת.');}}
 }
 
+function closeProjectorThermo(){
+ const b=document.getElementById('projectorThermoBtn');
+ if(b&&b.classList.contains('on'))b.click();
+}
 function openProjectorPart(n){
- if(n===1){window.dispatchEvent(new CustomEvent('projector-part-change',{detail:1}));return;}
+ if(n===1){closeProjectorThermo();window.dispatchEvent(new CustomEvent('projector-part-change',{detail:1}));return;}
  if(n===2){
    window.dispatchEvent(new CustomEvent('projector-part-change',{detail:1}));
    setTimeout(()=>waitFor('#projectorThermoBtn',b=>{if(!b.classList.contains('on'))b.click();}),500);
    return;
  }
- if(n===3){window.dispatchEvent(new CustomEvent('projector-part-change',{detail:3}));return;}
- if(n===4){window.dispatchEvent(new CustomEvent('projector-part-change',{detail:4}));return;}
+ if(n===3){closeProjectorThermo();window.dispatchEvent(new CustomEvent('projector-part-change',{detail:3}));return;}
+ if(n===4){closeProjectorThermo();window.dispatchEvent(new CustomEvent('projector-part-change',{detail:4}));return;}
 }
 
 function injectProjectorParts(){
