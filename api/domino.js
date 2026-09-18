@@ -50,7 +50,8 @@ async function roster(code){const shards=await Promise.all(Array.from({length:SH
 async function join(code,id,name){const key=rosterKey(code,hash(id)%SHARDS);for(let a=0;a<5;a++){const cur=await cache().get(key)||{};const next={...cur,[id]:{id,name,joinedAt:cur[id]?.joinedAt||Date.now()}};await cache().set(key,next,{ttl:TTL});const v=await cache().get(key)||{};if(v[id])return v[id];await new Promise(r=>setTimeout(r,25+a*20));}throw new Error('join_race');}
 function publicState(g){return{phase:g.phase,version:g.version||1,chainCount:g.chainCount||0,chain:(g.chain||[]).map(tileBy).filter(Boolean),currentClue:g.chainCount?tileBy(g.chainCount)?.right:'התחלה',lastPlayer:g.lastPlayer||''};}
 export default async function handler(req,res){res.setHeader('Cache-Control','no-store');try{
- const code=clean(req.method==='GET'?req.query?.code:(req.body?.code||''),10);
+ const b=req.method==='POST'?await body(req):{};
+ const code=clean(req.method==='GET'?req.query?.code:(b.code||''),10);
  if(!code)return res.status(400).json({error:'missing_code'});
  const r=await room(code);if(!r)return res.status(404).json({error:'room_not_found'});
  if(req.method==='GET'){
@@ -60,7 +61,7 @@ export default async function handler(req,res){res.setHeader('Cache-Control','no
   return res.json(out);
  }
  if(req.method!=='POST')return res.status(405).json({error:'method'});
- const b=await body(req), action=clean(b.action,30), g=await game(code);
+ const action=clean(b.action,30), g=await game(code);
  if(action==='join'){
   if(g.phase!=='lobby')return res.status(409).json({error:'game_started'});
   const id=clean(b.playerId,140),name=clean(b.name,24);if(!id||!name)return res.status(400).json({error:'bad_player'});
