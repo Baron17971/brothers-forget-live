@@ -44,7 +44,7 @@ const tiles=[
 const tileBy=id=>tiles[id-1]||null;
 function shuffle(a){const x=[...a];for(let i=x.length-1;i>0;i--){const j=crypto.randomInt(i+1);[x[i],x[j]]=[x[j],x[i]];}return x;}
 async function room(code){return cache().get(roomKey(code));}
-async function game(code){return cache().get(gameKey(code))||{phase:'lobby',version:1,chainCount:0,chain:[],assignments:{},playerOrder:[],lastPlayer:''};}
+async function game(code){return (await cache().get(gameKey(code)))||{phase:'lobby',version:1,chainCount:0,chain:[],assignments:{},playerOrder:[],lastPlayer:''};}
 async function save(code,g){await cache().set(gameKey(code),g,{ttl:TTL});}
 async function roster(code){const shards=await Promise.all(Array.from({length:SHARDS},(_,i)=>cache().get(rosterKey(code,i))));const out=[];for(const s of shards)if(s)for(const p of Object.values(s))if(p&&p.id&&p.name)out.push(p);return out.sort((a,b)=>(a.joinedAt||0)-(b.joinedAt||0));}
 async function join(code,id,name){const key=rosterKey(code,hash(id)%SHARDS);for(let a=0;a<5;a++){const cur=await cache().get(key)||{};const next={...cur,[id]:{id,name,joinedAt:cur[id]?.joinedAt||Date.now()}};await cache().set(key,next,{ttl:TTL});const v=await cache().get(key)||{};if(v[id])return v[id];await new Promise(r=>setTimeout(r,25+a*20));}throw new Error('join_race');}
