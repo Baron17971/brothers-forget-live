@@ -1,7 +1,17 @@
 {
-  "$schema":"https://openapi.vercel.sh/vercel.json",
-  "rewrites":[
-    {"source":"/join","destination":"/index.html"},
-    {"source":"/teacher","destination":"/index.html"}
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/join",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/teacher",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/domino",
+      "destination": "/domino.html"
+    }
   ]
 }
