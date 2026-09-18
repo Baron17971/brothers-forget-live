@@ -33,6 +33,32 @@ document.body.appendChild(root);
 let view='board';
 let lastStage=null;
 let lastPaint='';
+let forcedProjectorPart=1;
+
+async function setRoomStage(stage){
+  try{
+    const r=await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'setStage',code,teacherToken:token,stage})});
+    if(!r.ok)throw new Error('stage');
+    return true;
+  }catch(e){return false;}
+}
+
+window.addEventListener('projector-part-change',async e=>{
+  const part=Number(e.detail||1);
+  forcedProjectorPart=part;
+  if(part===1){
+    view='board';
+    await setRoomStage(1);
+  }else if(part===3){
+    view='board';
+    await setRoomStage(2);
+  }else if(part===4){
+    view='charter';
+    await setRoomStage(1);
+  }
+  lastPaint='';
+  tick();
+});
 
 async function getRoom(){
   const r=await fetch('/api/room?code='+encodeURIComponent(code)+'&teacherToken='+encodeURIComponent(token),{cache:'no-store'});
@@ -80,7 +106,10 @@ async function tick(){
   try{
     const [room,charterData]=await Promise.all([getRoom(),getCharter()]);
     if(!room.teacher)throw new Error('auth');
-    if(lastStage!==room.activeStage){lastStage=room.activeStage;view='board';}
+    if(lastStage!==room.activeStage){
+      lastStage=room.activeStage;
+      if(!(forcedProjectorPart===4&&room.activeStage===1)) view='board';
+    }
     const title=room.activeStage===1?(view==='charter'?'מה למדנו?':'למידה בחברותא'):'ענן מילים כיתתי';
     const sub=room.activeStage===1?(view==='charter'?'5 כללים לאמנת המחלוקת הכיתתית':'8 קבוצות · 8 סיפורי מחלוקת'):'מה חוזר שוב ושוב?';
     const content=room.activeStage===1?(view==='charter'?charter(charterData):board(room)):cloud(room);
