@@ -29,7 +29,11 @@ function ensureStyles(){
  .teacher-four-parts-title{font-size:13px;font-weight:800;opacity:.68;margin-top:14px}
  .charter-subnav{display:none!important}
  @media(max-width:760px){.four-parts-nav{grid-template-columns:1fr 1fr;gap:8px}.four-parts-nav button{min-height:58px;padding:10px 8px}}
- .projector-four-parts{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 18px}.projector-four-parts button{font:inherit;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:10px 18px;cursor:pointer}
+ .projector-mode .projector-toolbar{display:none!important}
+ .projector-four-parts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0 20px}
+ .projector-four-parts button{font:inherit;font-weight:800;border:1px solid rgba(72,42,104,.18);border-radius:16px;padding:13px 12px;min-height:58px;cursor:pointer;background:#fff;color:#32194f;box-shadow:0 5px 16px rgba(36,20,58,.06)}
+ .projector-four-parts button.on{background:#e8dccb;border-color:#b99d78;box-shadow:inset 0 0 0 1px #b99d78}
+ @media(max-width:760px){.projector-four-parts{grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.projector-four-parts button{min-height:60px;padding:11px 8px;font-size:15px}}
  `;document.head.appendChild(s);
 }
 
