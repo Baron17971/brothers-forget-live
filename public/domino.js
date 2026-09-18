@@ -18,7 +18,23 @@ function tile(t,compact=false){
  const tone='tone-'+(((Number(t.id)||1)-1)%4+1);
  return '<div class="domino '+tone+(compact?' compact':'')+'"><div class="answer-half"><div class="art" aria-hidden="true">'+esc(t.art||'◈')+'</div><strong>'+esc(t.answer)+'</strong></div><div class="clue-half"><span class="clue-label">הרמז הבא</span><span>'+esc(t.clue)+'</span><b class="qm">?</b></div></div>';
 }
-function chainHtml(list){return list&&list.length?'<div class="chain">'+list.map(t=>tile(t,true)).join('')+'</div>':'<div class="waiting">השרשרת עדיין לא התחילה.</div>';}
+function chainHtml(list){
+ if(!list||!list.length)return '<div class="waiting">השרשרת עדיין לא התחילה.</div>';
+ const mobile=window.matchMedia('(max-width:760px)').matches;
+ const perRow=mobile?2:4;
+ const rows=[];
+ for(let i=0;i<list.length;i+=perRow)rows.push(list.slice(i,i+perRow));
+ return '<div class="chain-board">'+rows.map((row,ri)=>{
+   const dir=ri%2===0?'rtl':'ltr';
+   const cells=row.map((t,ci)=>{
+     const globalIndex=ri*perRow+ci;
+     const isLast=globalIndex===list.length-1;
+     return '<div class="chain-cell'+(isLast?' newest':'')+'">'+tile(t,true)+'</div>';
+   }).join('');
+   const connector=ri<rows.length-1?'<div class="chain-turn" aria-hidden="true"><span></span></div>':'';
+   return '<div class="chain-row '+dir+'">'+cells+connector+'</div>';
+ }).join('')+'</div>';
+}
 function progress(n){const p=Math.round((n/32)*100);return '<div class="progress"><span style="width:'+p+'%"></span></div><div class="tiny" style="margin-top:7px">'+n+'/32 אבנים</div>';}
 function complete(){return '<div class="quote">„כשכל אחד ממהר להניח את הקובייה שלו, השרשרת עלולה להישבר. הקשבה מחברת.”</div>';}
 function startPoll(fn){clearInterval(timer);timer=setInterval(fn,1100);}
