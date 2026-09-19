@@ -115,10 +115,8 @@ function projectorChainHtml(list){
      const id=String(Number(it.tile.id)||0).padStart(2,'0');
      const isLast=it.index===list.length-1;
      const alt=esc((it.tile.answer||'')+' — '+(it.tile.clue||''));
-     const cx=it.x+(it.footprintW/2);
-     const cy=it.y+(it.footprintH/2);
      return '<div class="projector-domino-pos'+(it.turn?' turn':'')+(isLast?' newest':'')+'" style="left:'+it.x+'px;top:'+it.y+'px;width:'+it.footprintW+'px;height:'+it.footprintH+'px">'+
-       '<img src="/domino-tiles/'+id+'.webp" alt="'+alt+'" class="projector-domino-img" style="left:'+cx+'px;top:'+cy+'px;width:'+tileW+'px;height:'+tileH+'px;transform:translate(-'+it.x+'px,-'+it.y+'px) translate(-50%,-50%) rotate('+it.rot+'deg)" loading="eager" decoding="async">'+
+       '<img src="/domino-tiles/'+id+'.webp" alt="'+alt+'" class="projector-domino-img" style="left:50%;top:50%;width:'+tileW+'px;height:'+tileH+'px;transform:translate(-50%,-50%) rotate('+it.rot+'deg)" loading="eager" decoding="async">'+
      '</div>';
    }).join('')+
  '</div></div>';
