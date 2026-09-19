@@ -173,3 +173,52 @@
   .chain-cell .domino.domino-picture{min-height:0;grid-template-columns:none}
   .domino-picture .domino-img{border-radius:10px}
 }
+
+/* True projector domino chain */
+.projector-chain-card{
+  overflow:hidden;
+}
+.projector-chain-scroll{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:8px 0 14px;
+  -webkit-overflow-scrolling:touch;
+}
+.projector-chain-board{
+  position:relative;
+  margin:0 auto;
+  direction:ltr;
+}
+.projector-domino-pos{
+  position:absolute;
+  overflow:visible;
+  z-index:2;
+}
+.projector-domino-img{
+  position:absolute;
+  left:50%;
+  top:50%;
+  display:block;
+  max-width:none;
+  object-fit:fill;
+  transform-origin:center center;
+  filter:drop-shadow(0 2px 3px rgba(31,24,39,.10));
+}
+.projector-domino-pos.turn{
+  z-index:3;
+}
+.projector-domino-pos.newest .projector-domino-img{
+  filter:
+    drop-shadow(0 0 5px rgba(109,76,145,.38))
+    drop-shadow(0 4px 8px rgba(31,24,39,.14));
+}
+.projector .projector-chain-card{
+  padding:18px 14px 24px;
+}
+@media(max-width:1000px){
+  .projector .projector-chain-card{
+    padding-left:8px;
+    padding-right:8px;
+  }
+}
