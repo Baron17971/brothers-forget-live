@@ -15,8 +15,9 @@ async function get(extra={}){let u='/api/domino?code='+encodeURIComponent(code);
 async function post(body){const r=await fetch('/api/domino',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,code})});let d={};try{d=await r.json();}catch(e){}if(!r.ok){const er=new Error(d.error||'request');er.code=d.error;throw er;}return d;}
 function hero(sub){return '<section class="hero"><div class="eyebrow">כשאחים שוכחים · פעילות סיום אופציונלית</div><h1>דומינו של מחלוקת</h1><p>'+esc(sub||'מקשיבים. ממתינים. מניחים בזמן הנכון.')+'</p></section>';}
 function tile(t,compact=false){
- const tone='tone-'+(((Number(t.id)||1)-1)%4+1);
- return '<div class="domino '+tone+(compact?' compact':'')+'"><div class="answer-half"><div class="art" aria-hidden="true">'+esc(t.art||'◈')+'</div><strong>'+esc(t.answer)+'</strong></div><div class="clue-half"><span class="clue-label">הרמז הבא</span><span>'+esc(t.clue)+'</span><b class="qm">?</b></div></div>';
+ const id=String(Number(t.id)||0).padStart(2,'0');
+ const alt=esc((t.answer||'')+' — '+(t.clue||''));
+ return '<div class="domino domino-picture'+(compact?' compact':'')+'"><img class="domino-img" src="/domino-tiles/'+id+'.webp" alt="'+alt+'" '+(compact?'loading="lazy"':'loading="eager"')+' decoding="async"></div>';
 }
 function chainHtml(list){
  if(!list||!list.length)return '<div class="waiting">השרשרת עדיין לא התחילה.</div>';

@@ -140,3 +140,36 @@
   .chain-row.rtl .chain-turn{left:4px}
   .chain-row.ltr .chain-turn{right:4px}
 }
+
+/* Final illustrated domino tiles */
+.domino.domino-picture{
+  display:block;
+  width:100%;
+  min-height:0;
+  border:0;
+  border-radius:0;
+  overflow:visible;
+  background:transparent;
+  box-shadow:none;
+}
+.domino-picture .domino-img{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  border-radius:14px;
+  filter:drop-shadow(0 3px 6px rgba(31,24,39,.10));
+}
+.mytile .domino.domino-picture{min-height:0;max-width:100%}
+.mytile .domino-picture .domino-img{width:100%;max-width:720px;margin:0 auto}
+.chain-cell .domino.domino-picture{min-height:0;height:auto}
+.chain-cell.newest .domino.domino-picture{box-shadow:none}
+.chain-cell.newest .domino-picture .domino-img{
+  filter:drop-shadow(0 0 4px rgba(109,76,145,.28)) drop-shadow(0 6px 12px rgba(31,24,39,.12));
+}
+.projector .chain-cell .domino.domino-picture{min-height:0}
+@media(max-width:760px){
+  .domino.domino-picture,
+  .chain-cell .domino.domino-picture{min-height:0;grid-template-columns:none}
+  .domino-picture .domino-img{border-radius:10px}
+}
