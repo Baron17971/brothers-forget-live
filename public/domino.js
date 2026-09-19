@@ -36,6 +36,87 @@ function chainHtml(list){
    return '<div class="chain-row '+dir+'">'+cells+connector+'</div>';
  }).join('')+'</div>';
 }
+function projectorChainHtml(list){
+ if(!list||!list.length)return '<div class="waiting">השרשרת עדיין לא התחילה.</div>';
+
+ const viewport=Math.max(820,Math.min(1460,(window.innerWidth||1440)-56));
+ const perRow=viewport>=1180?5:4;
+ const pad=14;
+ const ratio=3;
+ const tileW=Math.floor((viewport-(pad*2))/(perRow+(2/ratio)));
+ const tileH=Math.round(tileW/ratio);
+ const leftBase=pad+tileH;
+ const rowStep=tileW/2;
+ const firstRowY=pad+(tileW/4)-(tileH/2);
+
+ const items=[];
+ let i=0,row=0,dir='rtl';
+
+ while(i<list.length){
+   const remaining=list.length-i;
+   const hasTurn=remaining>perRow;
+   const straightCount=hasTurn?perRow:remaining;
+   const rowY=firstRowY+(row*rowStep);
+
+   for(let j=0;j<straightCount&&i<list.length;j++,i++){
+     const x=dir==='rtl'
+       ? leftBase+((perRow-1-j)*tileW)
+       : leftBase+(j*tileW);
+     items.push({
+       tile:list[i],
+       index:i,
+       x,
+       y:rowY,
+       w:tileW,
+       h:tileH,
+       rot:dir==='rtl'?0:180,
+       turn:false
+     });
+   }
+
+   if(hasTurn&&i<list.length){
+     const turnX=dir==='rtl'
+       ? leftBase-tileH
+       : leftBase+(perRow*tileW);
+     const turnY=rowY+(tileH/2)-(tileW/4);
+     items.push({
+       tile:list[i],
+       index:i,
+       x:turnX,
+       y:turnY,
+       w:tileH,
+       h:tileW,
+       rot:-90,
+       turn:true
+     });
+     i++;
+     row++;
+     dir=dir==='rtl'?'ltr':'rtl';
+   }else{
+     break;
+   }
+ }
+
+ let maxX=0,maxY=0;
+ for(const it of items){
+   maxX=Math.max(maxX,it.x+it.w);
+   maxY=Math.max(maxY,it.y+it.h);
+ }
+ const boardW=Math.ceil(maxX+pad);
+ const boardH=Math.ceil(maxY+pad);
+
+ return '<div class="projector-chain-scroll"><div class="projector-chain-board" style="width:'+boardW+'px;height:'+boardH+'px">'+
+   items.map(it=>{
+     const id=String(Number(it.tile.id)||0).padStart(2,'0');
+     const isLast=it.index===list.length-1;
+     const alt=esc((it.tile.answer||'')+' — '+(it.tile.clue||''));
+     return '<div class="projector-domino-pos'+(it.turn?' turn':'')+(isLast?' newest':'')+'" style="left:'+it.x+'px;top:'+it.y+'px;width:'+it.w+'px;height:'+it.h+'px">'+
+       '<img src="/domino-tiles/'+id+'.webp" alt="'+alt+'" class="projector-domino-img" style="width:'+tileW+'px;height:'+tileH+'px;transform:translate(-50%,-50%) rotate('+it.rot+'deg)" loading="eager" decoding="async">'+
+     '</div>';
+   }).join('')+
+ '</div></div>';
+}
+
 function progress(n){const p=Math.round((n/32)*100);return '<div class="progress"><span style="width:'+p+'%"></span></div><div class="tiny" style="margin-top:7px">'+n+'/32 אבנים</div>';}
 function complete(){return '<div class="quote">„כשכל אחד ממהר להניח את הקובייה שלו, השרשרת עלולה להישבר. הקשבה מחברת.”</div>';}
 function startPoll(fn){clearInterval(timer);timer=setInterval(fn,1100);}
