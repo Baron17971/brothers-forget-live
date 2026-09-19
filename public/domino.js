@@ -39,85 +39,86 @@ function chainHtml(list){
 function projectorChainHtml(list){
  if(!list||!list.length)return '<div class="waiting">השרשרת עדיין לא התחילה.</div>';
 
- const viewport=Math.max(720,Math.min(1380,(window.innerWidth||1280)-72));
- const straightPerRow=viewport>=1180?5:4;
- const pad=18;
- const tileW=Math.floor((viewport-(pad*2))/(straightPerRow+0.5));
- const tileH=Math.round(tileW/3);
- const startX=pad+tileH+(straightPerRow*tileW);
- const startY=pad+(tileH/2);
+ // The artwork itself is a wide 960×504-style card.  Keep that
+ // aspect ratio everywhere so a side piece is ONLY rotated, never narrowed.
+ const CARD_RATIO=960/504;
+ const pad=12;
+ const viewport=Math.max(760,Math.min(1580,(window.innerWidth||1280)-52));
+
+ // Final board geometry:
+ // row 1: 8 straight tiles, left turn 9
+ // row 2: 7 straight tiles upside-down, right turn 17
+ // row 3: 7 straight tiles upright, left turn 25
+ // row 4: 7 straight tiles upside-down
+ const tileW=Math.floor((viewport-(pad*2))/(8+(1/CARD_RATIO)));
+ const tileH=Math.round(tileW/CARD_RATIO);
+ const turnW=tileH;   // exact footprint after rotating the SAME tile 90°
+ const turnH=tileW;
+
+ const leftX=pad+turnW;
+ const row1Y=pad;
+ const row2Y=row1Y+tileH+turnH;
+ const row3Y=row2Y+tileH+turnH;
+ const row4Y=row3Y+tileH+turnH;
 
  const items=[];
- let i=0;
- let dir='rtl';
- let point={x:startX,y:startY};
-
- function addHorizontal(tile,index,rotation){
-   let cx,cy=point.y,nextX;
-   if(rotation===0){
-     cx=point.x-(tileW/2);
-     nextX=point.x-tileW;
-   }else{
-     cx=point.x+(tileW/2);
-     nextX=point.x+tileW;
-   }
+ const add=(index,x,y,rot,turn=false)=>{
+   if(index>=list.length)return;
    items.push({
-     tile,index,rot:rotation,
-     cx,cy,
-     footprintW:tileW,footprintH:tileH,
-     turn:false
+     tile:list[index],
+     index,
+     x,y,rot,turn,
+     footprintW:turn?turnW:tileW,
+     footprintH:turn?turnH:tileH
    });
-   point={x:nextX,y:point.y};
+ };
+
+ // 1–8: start at the upper-right and travel left. Upright.
+ for(let index=0;index<=7;index++){
+   const col=7-index;
+   add(index,leftX+(col*tileW),row1Y,0,false);
  }
 
- function addTurn(tile,index){
-   const cx=point.x;
-   const cy=point.y+(tileW/2);
-   items.push({
-     tile,index,rot:-90,
-     cx,cy,
-     footprintW:tileH,footprintH:tileW,
-     turn:true
-   });
-   point={x:point.x,y:point.y+tileW};
+ // 9: left-side connector. Same tile size; only rotated.
+ add(8,pad,row1Y+tileH,-90,true);
+
+ // 10–16: after the first turn the chain travels to the right.
+ // These tiles are physically turned 180°, like a real domino chain.
+ for(let index=9;index<=15;index++){
+   const col=index-9;
+   add(index,leftX+(col*tileW),row2Y,180,false);
  }
 
- while(i<list.length){
-   const remaining=list.length-i;
-   const straightCount=Math.min(straightPerRow,remaining);
+ // 17: right-side connector. Same tile size; only rotated.
+ add(16,leftX+(7*tileW)-turnW,row2Y+tileH,-90,true);
 
-   for(let j=0;j<straightCount&&i<list.length;j++,i++){
-     addHorizontal(list[i],i,dir==='rtl'?0:180);
-   }
-
-   if(i<list.length){
-     addTurn(list[i],i);
-     i++;
-     dir=dir==='rtl'?'ltr':'rtl';
-   }
+ // 18–24: travel back to the left. Upright again.
+ for(let index=17;index<=23;index++){
+   const col=23-index;
+   add(index,leftX+(col*tileW),row3Y,0,false);
  }
 
- let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
- for(const it of items){
-   minX=Math.min(minX,it.cx-(it.footprintW/2));
-   maxX=Math.max(maxX,it.cx+(it.footprintW/2));
-   minY=Math.min(minY,it.cy-(it.footprintH/2));
-   maxY=Math.max(maxY,it.cy+(it.footprintH/2));
+ // 25: left-side connector.
+ add(24,pad,row3Y+tileH,-90,true);
+
+ // 26–32: final run to the right, therefore upside-down again.
+ for(let index=25;index<=31;index++){
+   const col=index-25;
+   add(index,leftX+(col*tileW),row4Y,180,false);
  }
- const shiftX=pad-minX;
- const shiftY=pad-minY;
- const boardW=Math.ceil(maxX-minX+(pad*2));
- const boardH=Math.ceil(maxY-minY+(pad*2));
+
+ const boardW=Math.ceil(leftX+(8*tileW)+pad);
+ const boardH=Math.ceil(row4Y+tileH+pad);
 
  return '<div class="projector-chain-scroll"><div class="projector-chain-board" style="width:'+boardW+'px;height:'+boardH+'px">'+
    items.map(it=>{
      const id=String(Number(it.tile.id)||0).padStart(2,'0');
      const isLast=it.index===list.length-1;
      const alt=esc((it.tile.answer||'')+' — '+(it.tile.clue||''));
-     const left=it.cx+shiftX;
-     const top=it.cy+shiftY;
-     return '<div class="projector-domino-pos'+(it.turn?' turn':'')+(isLast?' newest':'')+'" style="left:'+left+'px;top:'+top+'px;width:'+it.footprintW+'px;height:'+it.footprintH+'px">'+
-       '<img src="/domino-tiles/'+id+'.webp" alt="'+alt+'" class="projector-domino-img" style="width:'+tileW+'px;height:'+tileH+'px;transform:translate(-50%,-50%) rotate('+it.rot+'deg)" loading="eager" decoding="async">'+
+     const cx=it.x+(it.footprintW/2);
+     const cy=it.y+(it.footprintH/2);
+     return '<div class="projector-domino-pos'+(it.turn?' turn':'')+(isLast?' newest':'')+'" style="left:'+it.x+'px;top:'+it.y+'px;width:'+it.footprintW+'px;height:'+it.footprintH+'px">'+
+       '<img src="/domino-tiles/'+id+'.webp" alt="'+alt+'" class="projector-domino-img" style="left:'+cx+'px;top:'+cy+'px;width:'+tileW+'px;height:'+tileH+'px;transform:translate(-'+it.x+'px,-'+it.y+'px) translate(-50%,-50%) rotate('+it.rot+'deg)" loading="eager" decoding="async">'+
      '</div>';
    }).join('')+
  '</div></div>';
