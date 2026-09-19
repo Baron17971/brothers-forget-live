@@ -79,8 +79,10 @@ function projectorChainHtml(list){
    add(index,leftX+(col*tileW),row1Y,0,false);
  }
 
+ const LEFT_TURN_PUSH=Math.round(tileH*0.22);
+
  // 9: left-side connector. Same tile size; only rotated.
- add(8,pad,row1Y+tileH,-90,true);
+ add(8,pad+LEFT_TURN_PUSH,row1Y+tileH,-90,true);
 
  // 10–16: after the first turn the chain travels to the right.
  // These tiles are physically turned 180°, like a real domino chain.
@@ -99,7 +101,7 @@ function projectorChainHtml(list){
  }
 
  // 25: left-side connector.
- add(24,pad,row3Y+tileH,-90,true);
+ add(24,pad+LEFT_TURN_PUSH,row3Y+tileH,-90,true);
 
  // 26–32: final run to the right, therefore upside-down again.
  for(let index=25;index<=31;index++){
