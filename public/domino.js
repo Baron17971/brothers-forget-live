@@ -39,78 +39,84 @@ function chainHtml(list){
 function projectorChainHtml(list){
  if(!list||!list.length)return '<div class="waiting">השרשרת עדיין לא התחילה.</div>';
 
- const viewport=Math.max(820,Math.min(1460,(window.innerWidth||1440)-56));
- const perRow=viewport>=1180?5:4;
- const pad=14;
- const ratio=3;
- const tileW=Math.floor((viewport-(pad*2))/(perRow+(2/ratio)));
- const tileH=Math.round(tileW/ratio);
- const leftBase=pad+tileH;
- const rowStep=tileW/2;
- const firstRowY=pad+(tileW/4)-(tileH/2);
+ const viewport=Math.max(720,Math.min(1380,(window.innerWidth||1280)-72));
+ const straightPerRow=viewport>=1180?5:4;
+ const pad=18;
+ const tileW=Math.floor((viewport-(pad*2))/(straightPerRow+0.5));
+ const tileH=Math.round(tileW/3);
+ const startX=pad+tileH+(straightPerRow*tileW);
+ const startY=pad+(tileH/2);
 
  const items=[];
- let i=0,row=0,dir='rtl';
+ let i=0;
+ let dir='rtl';
+ let point={x:startX,y:startY};
+
+ function addHorizontal(tile,index,rotation){
+   let cx,cy=point.y,nextX;
+   if(rotation===0){
+     cx=point.x-(tileW/2);
+     nextX=point.x-tileW;
+   }else{
+     cx=point.x+(tileW/2);
+     nextX=point.x+tileW;
+   }
+   items.push({
+     tile,index,rot:rotation,
+     cx,cy,
+     footprintW:tileW,footprintH:tileH,
+     turn:false
+   });
+   point={x:nextX,y:point.y};
+ }
+
+ function addTurn(tile,index){
+   const cx=point.x;
+   const cy=point.y+(tileW/2);
+   items.push({
+     tile,index,rot:-90,
+     cx,cy,
+     footprintW:tileH,footprintH:tileW,
+     turn:true
+   });
+   point={x:point.x,y:point.y+tileW};
+ }
 
  while(i<list.length){
    const remaining=list.length-i;
-   const hasTurn=remaining>perRow;
-   const straightCount=hasTurn?perRow:remaining;
-   const rowY=firstRowY+(row*rowStep);
+   const straightCount=Math.min(straightPerRow,remaining);
 
    for(let j=0;j<straightCount&&i<list.length;j++,i++){
-     const x=dir==='rtl'
-       ? leftBase+((perRow-1-j)*tileW)
-       : leftBase+(j*tileW);
-     items.push({
-       tile:list[i],
-       index:i,
-       x,
-       y:rowY,
-       w:tileW,
-       h:tileH,
-       rot:dir==='rtl'?0:180,
-       turn:false
-     });
+     addHorizontal(list[i],i,dir==='rtl'?0:180);
    }
 
-   if(hasTurn&&i<list.length){
-     const turnX=dir==='rtl'
-       ? leftBase-tileH
-       : leftBase+(perRow*tileW);
-     const turnY=rowY+(tileH/2)-(tileW/4);
-     items.push({
-       tile:list[i],
-       index:i,
-       x:turnX,
-       y:turnY,
-       w:tileH,
-       h:tileW,
-       rot:-90,
-       turn:true
-     });
+   if(i<list.length){
+     addTurn(list[i],i);
      i++;
-     row++;
      dir=dir==='rtl'?'ltr':'rtl';
-   }else{
-     break;
    }
  }
 
- let maxX=0,maxY=0;
+ let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
  for(const it of items){
-   maxX=Math.max(maxX,it.x+it.w);
-   maxY=Math.max(maxY,it.y+it.h);
+   minX=Math.min(minX,it.cx-(it.footprintW/2));
+   maxX=Math.max(maxX,it.cx+(it.footprintW/2));
+   minY=Math.min(minY,it.cy-(it.footprintH/2));
+   maxY=Math.max(maxY,it.cy+(it.footprintH/2));
  }
- const boardW=Math.ceil(maxX+pad);
- const boardH=Math.ceil(maxY+pad);
+ const shiftX=pad-minX;
+ const shiftY=pad-minY;
+ const boardW=Math.ceil(maxX-minX+(pad*2));
+ const boardH=Math.ceil(maxY-minY+(pad*2));
 
  return '<div class="projector-chain-scroll"><div class="projector-chain-board" style="width:'+boardW+'px;height:'+boardH+'px">'+
    items.map(it=>{
      const id=String(Number(it.tile.id)||0).padStart(2,'0');
      const isLast=it.index===list.length-1;
      const alt=esc((it.tile.answer||'')+' — '+(it.tile.clue||''));
-     return '<div class="projector-domino-pos'+(it.turn?' turn':'')+(isLast?' newest':'')+'" style="left:'+it.x+'px;top:'+it.y+'px;width:'+it.w+'px;height:'+it.h+'px">'+
+     const left=it.cx+shiftX;
+     const top=it.cy+shiftY;
+     return '<div class="projector-domino-pos'+(it.turn?' turn':'')+(isLast?' newest':'')+'" style="left:'+left+'px;top:'+top+'px;width:'+it.footprintW+'px;height:'+it.footprintH+'px">'+
        '<img src="/domino-tiles/'+id+'.webp" alt="'+alt+'" class="projector-domino-img" style="width:'+tileW+'px;height:'+tileH+'px;transform:translate(-50%,-50%) rotate('+it.rot+'deg)" loading="eager" decoding="async">'+
      '</div>';
    }).join('')+
@@ -153,7 +159,7 @@ async function renderProjector(){
   (d.phase==='lobby'?'סרקו והצטרפו ללובי':d.phase==='playing'?'מי מחזיק את התשובה?':'המשחק הסתיים')+
   '</strong><div class="muted">'+(d.players||[]).length+' תלמידים מחוברים</div></div></div></div>'+
   (d.currentClue?'<div class="open-clue projector-clue"><span>הרמז הפתוח</span>„'+esc(d.currentClue)+'”</div>':'')+
-  '<div style="margin-top:18px">'+progress(d.chainCount||0)+'</div></section><section class="card">'+chainHtml(d.chain||[])+
+  '<div style="margin-top:18px">'+progress(d.chainCount||0)+'</div></section><section class="card projector-chain-card">'+projectorChainHtml(d.chain||[])+
   (d.lastPlayer?'<div class="feedback ok">✓ '+esc(d.lastPlayer)+' חיבר/ה את האבן האחרונה</div>':'')+
   (d.phase==='complete'?complete():'')+'</section></div>';
   startPoll(async()=>{try{const n=await get({teacherToken:token});if(n.version!==d.version)renderProjector();}catch(e){}});
