@@ -79,7 +79,7 @@ function projectorChainHtml(list){
    add(index,leftX+(col*tileW),row1Y,0,false);
  }
 
- const LEFT_TURN_PUSH=Math.round(tileH*0.22);
+ const LEFT_TURN_PUSH=Math.round(tileH*0.58);
 
  // 9: left-side connector. Same tile size; only rotated.
  add(8,pad+LEFT_TURN_PUSH,row1Y+tileH,-90,true);
